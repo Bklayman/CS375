@@ -3,17 +3,7 @@
 #include <list>
 #include <map>
 #include <string>
-
-void printFinalResults(std::list<std::pair<std::list<std::string>, int>> results){
-  for(std::list<std::pair<std::list<std::string>, int>>::iterator it = results.begin(); it != results.end(); ++it){
-    std::cout << "Profit: " << (*it).second << std::endl;
-    std::list<std::string> cardNames = (*it).first;
-    for(std::list<std::string>::iterator it = cardNames.begin(); it != cardNames.end(); ++it){
-      std::cout << *it << std::endl;
-    }
-  }
-  std::cout << std::endl;
-}
+#include <time.h>
 
 int stringToInt(std::string originalString){
   int result;
@@ -94,8 +84,8 @@ std::list<std::map<std::string, int>> getPriceLists(char* priceListFileName){
   return priceLists;
 }
 
-std::pair<std::list<std::string>, int> profitHelper(std::map<std::string, int> marketPrices, std::map<std::string, int> priceList, std::map<std::string, int>::iterator it, int curProfit, std::list<std::string> curCards, int moneyLeft){
-  if(it == priceList.end()){
+std::pair<std::list<std::string>, int> profitHelper(std::map<std::string, int> marketPrices, std::map<std::string, int>* priceList, std::map<std::string, int>::iterator it, int curProfit, std::list<std::string> curCards, int moneyLeft){
+  if(it == priceList->end()){
     return std::pair<std::list<std::string>, int>(curCards, curProfit);
   }
   if(it->first == "MoneyAmount"){
@@ -108,7 +98,7 @@ std::pair<std::list<std::string>, int> profitHelper(std::map<std::string, int> m
   if(moneyLeft < cardPrice){
     return noCardAdd;
   }
-  curProfit+= marketPrices[cardName] - cardPrice;
+  curProfit+= marketPrices[cardName] - 2 * cardPrice;
   curCards.push_back(cardName);
   moneyLeft-= cardPrice;
   std::pair<std::list<std::string>, int> cardAdd = profitHelper(marketPrices, priceList, it, curProfit, curCards, moneyLeft);
@@ -118,12 +108,28 @@ std::pair<std::list<std::string>, int> profitHelper(std::map<std::string, int> m
   return cardAdd;
 }
 
-std::pair<std::list<std::string>, int> getMaximumProfit(std::map<std::string, int> marketPrices, std::map<std::string, int> priceList){
+std::pair<std::list<std::string>, int> getMaximumProfit(std::map<std::string, int> marketPrices, std::map<std::string, int>* priceList){
   std::list<std::string> winningCards;
-  return profitHelper(marketPrices, priceList, priceList.begin(), 0, winningCards, priceList["MoneyAmount"]);
+  return profitHelper(marketPrices, priceList, priceList->begin(), (*priceList)["MoneyAmount"], winningCards, (*priceList)["MoneyAmount"]);
+}
+
+void writeResultsToOutput(std::list<std::pair<std::list<std::string>, int>> results, std::list<std::map<std::string, int>> priceLists, std::list<time_t> timeTaken){
+  std::ofstream outputFile;
+  outputFile.open("output.txt");
+  std::list<std::map<std::string, int>>::iterator itPriceLists = priceLists.begin();
+  std::list<time_t>::iterator itTime = timeTaken.begin();
+  for(std::list<std::pair<std::list<std::string>, int>>::iterator itResults = results.begin(); itResults != results.end(); ++itResults){
+    outputFile << (*itPriceLists).size() - 1 << " " << (*itResults).second << " " << (*itResults).first.size() << " " << *itTime << std::endl;
+    for(std::list<std::string>::iterator itCardResults = (*itResults).first.begin(); itCardResults != (*itResults).first.end(); ++itCardResults){
+      outputFile << *itCardResults << std::endl;
+    }
+    ++itTime;
+    ++itPriceLists;
+  }
 }
 
 int main(int argc, char* argv[]){
+  time_t timeStart = time (NULL);
   if(argc != 5){
     std::cout << "Usage: ./program1 -m <market-price-file> -p <price-list-file>" << std::endl;
     exit(1);
@@ -132,9 +138,13 @@ int main(int argc, char* argv[]){
   std::map<std::string, int> marketPricesMap = getMarketPricesMap(argv[2]);
   std::list<std::map<std::string, int>> priceLists = getPriceLists(argv[4]);
   std::list<std::pair<std::list<std::string>, int>> results;
+  std::list<time_t> timeTaken;
+
   for(std::list<std::map<std::string, int>>::iterator it = priceLists.begin(); it != priceLists.end(); ++it){
-    std::cout << "Starting" << std::endl;
-    results.push_back(getMaximumProfit(marketPricesMap, *it));
+    results.push_back(getMaximumProfit(marketPricesMap, &*it));
+    time_t curTimeTaken = time(NULL);
+    timeTaken.push_back(curTimeTaken - timeStart);
   }
-  printFinalResults(results);
+
+  writeResultsToOutput(results, priceLists, timeTaken);
 }
