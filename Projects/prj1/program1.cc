@@ -135,8 +135,28 @@ int main(int argc, char* argv[]){
     exit(1);
   }
 
-  std::map<std::string, int> marketPricesMap = getMarketPricesMap(argv[2]);
-  std::list<std::map<std::string, int>> priceLists = getPriceLists(argv[4]);
+  char* marketName;
+  char* priceName;
+  if(std::strncmp(argv[1], "-m", 3) == 0){
+    marketName = argv[2];
+  } else if (std::strncmp(argv[3], "-m", 3) == 0) {
+    marketName = argv[4];
+  } else {
+    std::cout << "Error: no -m found in the command line input" << std::endl;
+    exit(1);
+  }
+
+  if(std::strncmp(argv[1], "-p", 3) == 0){
+    priceName = argv[2];
+  } else if (std::strncmp(argv[3], "-p", 3) == 0) {
+    priceName = argv[4];
+  } else {
+    std::cout << "Error: no -p found in the command line input" << std::endl;
+    exit(1);
+  }
+
+  std::map<std::string, int> marketPricesMap = getMarketPricesMap(marketName);
+  std::list<std::map<std::string, int>> priceLists = getPriceLists(priceName);
   std::list<std::pair<std::list<std::string>, int>> results;
   std::list<time_t> timeTaken;
 
