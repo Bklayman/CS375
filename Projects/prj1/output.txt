@@ -1,6 +1,6 @@
-2 2800 2 1
+2 2800 2 0
 JimRice1975
 RickyHenderson1983
-3 1100 2 1
+3 1100 2 0
 DerekJeter1996
 JimRice1975
