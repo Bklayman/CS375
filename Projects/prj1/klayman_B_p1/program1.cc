@@ -99,7 +99,7 @@ std::pair<std::list<std::string>, int> profitHelper(std::map<std::string, int> m
   if(moneyLeft < cardPrice){
     return noCardAdd;
   }
-  curProfit+= marketPrices[cardName] - 2 * cardPrice;
+  curProfit+= marketPrices[cardName] - cardPrice;
   curCards.push_back(cardName);
   moneyLeft-= cardPrice;
   std::pair<std::list<std::string>, int> cardAdd = profitHelper(marketPrices, priceList, it, curProfit, curCards, moneyLeft);
