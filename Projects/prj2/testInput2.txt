@@ -1,0 +1,5 @@
+5
+insertContestant <1> <2>
+insertContestant <2> <1>
+eliminateWeakest
+showContestants

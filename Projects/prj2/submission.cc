@@ -14,36 +14,67 @@ void printHandles(std::map<int, int> *indexHandler, std::ofstream *outputFile, i
   }
   for(int i = 0; i < maxHeapSize; i++){
     if(usedNums[i] == -1){
-      *outputFile << "There is no Contestant <" << i << "> in the extended heap: handle[<" << i << ">] = -1." << std::endl;
+      *outputFile << "There is no Contestant <" << i + 1 << "> in the extended heap: handle[<" << i + 1 << ">] = -1." << std::endl;
     } else {
-      *outputFile << "Contestant <" << i << "> stored in extended heap location <" << usedNums[i] << ">." << std::endl;
+      *outputFile << "Contestant <" << i + 1 << "> stored in extended heap location <" << usedNums[i] + 1 << ">." << std::endl;
+    }
+  }
+}
+
+void printHandles(std::map<int, int> *indexHandler, int maxHeapSize){
+  int usedNums[maxHeapSize];
+  for(int i = 0; i < maxHeapSize; i++){
+    usedNums[i] = -1;
+  }
+  for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
+    usedNums[it->first - 1] = it->second;
+  }
+  for(int i = 0; i < maxHeapSize; i++){
+    if(usedNums[i] == -1){
+      std::cout << "There is no Contestant <" << i + 1 << "> in the extended heap: handle[<" << i + 1 << ">] = -1." << std::endl;
+    } else {
+      std::cout << "Contestant <" << i + 1 << "> stored in extended heap location <" << usedNums[i] + 1 << ">." << std::endl;
     }
   }
 }
 
 void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, std::ofstream *outputFile){
   for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
-    *outputFile << "Contestant <" << it->first << "> in extended heap location <" << it->second << "> with score <" << (*pointsMinHeap)[it->second] << ">." << std::endl;
+    *outputFile << "Contestant <" << it->first << "> in extended heap location <" << it->second + 1 << "> with score <" << (*pointsMinHeap)[it->second] << ">." << std::endl;
   }
 }
 
-void swapNodes(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index1, int index2){
+void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){
+  for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
+    std::cout << "Contestant <" << it->first << "> in extended heap location <" << it->second + 1 << "> with score <" << (*pointsMinHeap)[it->second] << ">." << std::endl;
+  }
+}
+
+void swapNodes(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index1, int index2){ //Duplicates an item in indexHandler
+  std::cout << index1 << " " << index2 << std::endl;
   if(index1 >= indexHandler->size() || index2 >= indexHandler->size()){
     std::cout << "Error: swap has bad indexes" << std::endl;
     exit(1);
   }
-  int location1 = (*indexHandler)[index1];
+  std::cout << indexHandler->size() << std::endl;
+  int location1 = (*indexHandler)[index1 + 1]; //Adds an item to indexHandler
+  std::cout << indexHandler->size() << std::endl;
   int points1 = (*pointsMinHeap)[location1];
-  int location2 = (*indexHandler)[index2];
+  int location2 = (*indexHandler)[index2 + 1];
   (*pointsMinHeap)[location1] = (*pointsMinHeap)[location2];
-  (*indexHandler)[index1] = location2;
-  (*indexHandler)[index2] = location1;
+  (*indexHandler)[index1 + 1] = location2;
+  (*indexHandler)[index2 + 1] = location1;
   (*pointsMinHeap)[location2] = points1;
 }
 
-void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){ //Index handler randomly duplicates second element
-  for(int i = pointsMinHeap->size() / 2; i >= 0; i--){
-    while(i != 0){
+void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){ //Duplicates an item in swap
+  for(int i = pointsMinHeap->size() / 2 - 1; i >= 0 && pointsMinHeap->size() != 1; i--){
+    int curI = i;
+    bool finished = false;
+    while(!finished){
+      if(i == 0){
+        finished = true;
+      }
       int minFound = 0;
       int minPoints = (*pointsMinHeap)[i];
       if((*pointsMinHeap)[(int)i] > (*pointsMinHeap)[(int)2i + 1]){
@@ -56,14 +87,17 @@ void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandle
       }
       switch(minFound){
         case 1:
+          std::cout << (int)i << " " << (int)2i + 1 << std::endl;
           swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2i + 1);
           break;
         case 2:
+          std::cout << (int)i << " " << (int)2i + 2 << std::endl;
           swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2i+2);
           break;
       }
       i /= 2;
     }
+    i = curI;
   }
 }
 
@@ -81,9 +115,22 @@ std::string eliminateWeakest(std::vector<int> *pointsMinHeap, std::map<int, int>
     }
     int weakPoints = (*pointsMinHeap)[0];
     result += "Contestant <" + std::to_string(weakIndex) + "> with current lowest score <" + std::to_string(weakPoints) + "> eliminated.";
-    pointsMinHeap->erase(pointsMinHeap->begin(), pointsMinHeap->begin());
+    pointsMinHeap->erase(pointsMinHeap->begin(), pointsMinHeap->begin() + 1);
     indexHandler->erase(weakIndex);
-    minHeapify(pointsMinHeap, indexHandler);
+    int nextCopy = (*pointsMinHeap)[pointsMinHeap->size() - 1];
+    for(int i = 0; i < pointsMinHeap->size(); i++){
+      int curCopy = nextCopy;
+      nextCopy = (*pointsMinHeap)[i];
+      (*pointsMinHeap)[i] = curCopy;
+    }
+    //TODO: Change handle for the last element before to 0
+    for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
+      if(it->second == pointsMinHeap->size()){
+        it->second = 0;
+        break;
+      }
+    }
+    minHeapify(pointsMinHeap, indexHandler); //Adds to indexHandler for some reason
   }
   return result;
 }
@@ -239,7 +286,7 @@ int main(int argc, char* argv[]){
         outputFile << "Contestant <" << inputNum1 << "> stored in extended heap location <" << heapLocation << ">." << std::endl;
       }
     } else if(inputLine == "crownWinner") {
-
+      crownWinner(&pointsMinHeap, &indexHandler, &outputFile);
     } else {
       //Invaled Instruction
       std::cout << "Instruction " << inputLine << " is invalid." << std::endl;
