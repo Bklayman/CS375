@@ -10,7 +10,7 @@ void printHandles(std::map<int, int> *indexHandler, std::ofstream *outputFile, i
     usedNums[i] = -1;
   }
   for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
-    usedNums[it->first] = it->second;
+    usedNums[it->first - 1] = it->second;
   }
   for(int i = 0; i < maxHeapSize; i++){
     if(usedNums[i] == -1){
@@ -21,22 +21,22 @@ void printHandles(std::map<int, int> *indexHandler, std::ofstream *outputFile, i
   }
 }
 
-void printHandles(std::map<int, int> *indexHandler, int maxHeapSize){
-  int usedNums[maxHeapSize];
-  for(int i = 0; i < maxHeapSize; i++){
-    usedNums[i] = -1;
-  }
-  for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
-    usedNums[it->first - 1] = it->second;
-  }
-  for(int i = 0; i < maxHeapSize; i++){
-    if(usedNums[i] == -1){
-      std::cout << "There is no Contestant <" << i + 1 << "> in the extended heap: handle[<" << i + 1 << ">] = -1." << std::endl;
-    } else {
-      std::cout << "Contestant <" << i + 1 << "> stored in extended heap location <" << usedNums[i] + 1 << ">." << std::endl;
-    }
-  }
-}
+// void printHandles(std::map<int, int> *indexHandler, int maxHeapSize){
+//   int usedNums[maxHeapSize];
+//   for(int i = 0; i < maxHeapSize; i++){
+//     usedNums[i] = -1;
+//   }
+//   for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
+//     usedNums[it->first - 1] = it->second;
+//   }
+//   for(int i = 0; i < maxHeapSize; i++){
+//     if(usedNums[i] == -1){
+//       std::cout << "There is no Contestant <" << i + 1 << "> in the extended heap: handle[<" << i + 1 << ">] = -1." << std::endl;
+//     } else {
+//       std::cout << "Contestant <" << i + 1 << "> stored in extended heap location <" << usedNums[i] + 1 << ">." << std::endl;
+//     }
+//   }
+// }
 
 void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, std::ofstream *outputFile){
   int places[pointsMinHeap->size()];
@@ -48,11 +48,15 @@ void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *inde
   }
 }
 
-void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){
-  for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
-    std::cout << "Contestant <" << it->first << "> in extended heap location <" << it->second + 1 << "> with score <" << (*pointsMinHeap)[it->second] << ">." << std::endl;
-  }
-}
+// void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){
+//   int places[pointsMinHeap->size()];
+//   for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
+//     places[it->second] = it->first;
+//   }
+//   for(int i = 0; i < pointsMinHeap->size(); i++){
+//     std::cout << "Contestant <" << places[i] << "> in extended heap location <" << i + 1 << "> with score <" << (*pointsMinHeap)[i] << ">." << std::endl;
+//   }
+// }
 
 void swapNodes(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index1, int index2){ //Duplicates an item in indexHandler
   if(index1 >= indexHandler->size() || index2 >= indexHandler->size()){
@@ -146,7 +150,7 @@ void crownWinner(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandl
     eliminateWeakest(pointsMinHeap, indexHandler);
   }
   std::map<int, int>::iterator it = indexHandler->begin();
-  *outputFile << "Contestant <" << it->first << "> wins with score <" << (*pointsMinHeap)[it->first] << ">!" << std::endl;
+  *outputFile << "Contestant <" << it->first << "> wins with score <" << (*pointsMinHeap)[it->second] << ">!" << std::endl;
 }
 
 void insertContestant(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index, int points){
@@ -229,15 +233,17 @@ int main(int argc, char* argv[]){
       }
     } else if(inputLine.length() >= 18 && inputLine.substr(0, 14) == "findContestant") {
       //Find Contestant
+      outputFile << inputLine << std::endl;
       int inputNum = getFirstInput(inputLine);
       int contestantPoints = findContestant(&pointsMinHeap, &indexHandler, inputNum);
       if(contestantPoints == -1){
-        outputFile << "Contestant <" << inputNum << "> is not in the extended heap" << std::endl;
+        outputFile << "Contestant <" << inputNum << "> is not in the extended heap." << std::endl;
       } else {
         outputFile << "Contestant <" << inputNum << "> is in the extended heap with score <" << contestantPoints << ">." << std::endl;
       }
     } else if(inputLine.length() >= 24 && inputLine.substr(0, 16) == "insertContestant"){
       //Insert Contestant
+      outputFile << inputLine << std::endl;
       int inputNum1 = getFirstInput(inputLine);
       int inputNum2 = getSecondInput(inputLine);
       if(findContestant(&pointsMinHeap, &indexHandler, inputNum1) != -1){
@@ -252,10 +258,12 @@ int main(int argc, char* argv[]){
       }
     } else if(inputLine == "eliminateWeakest"){
       //Eliminate Weakest
+      outputFile << inputLine << std::endl;
       std::string result = eliminateWeakest(&pointsMinHeap, &indexHandler);
       outputFile << result << std::endl;
     } else if(inputLine.length() >= 18 && inputLine.substr(0, 10) == "earnPoints") {
       //Earn Points
+      outputFile << inputLine << std::endl;
       int inputNum1 = getFirstInput(inputLine);
       int inputNum2 = getSecondInput(inputLine);
       if(findContestant(&pointsMinHeap, &indexHandler, inputNum1) == -1){
@@ -269,6 +277,7 @@ int main(int argc, char* argv[]){
       }
     } else if(inputLine.length() >= 18 && inputLine.substr(0, 10) == "losePoints") {
       //Lose Points
+      outputFile << inputLine << std::endl;
       int inputNum1 = getFirstInput(inputLine);
       int inputNum2 = getSecondInput(inputLine);
       if(findContestant(&pointsMinHeap, &indexHandler, inputNum1) == -1){
@@ -281,12 +290,15 @@ int main(int argc, char* argv[]){
       }
     } else if(inputLine == "showContestants") {
       //Show Contestnats
+      outputFile << inputLine << std::endl;
       printExtendedHeap(&pointsMinHeap, &indexHandler, &outputFile);
     } else if(inputLine == "showHandles"){
       //Show Handles
+      outputFile << inputLine << std::endl;
       printHandles(&indexHandler, &outputFile, maxHeapSize);
     } else if(inputLine.length() >= 16 && inputLine.substr(0, 12) == "showLocation"){
       //Show Location
+      outputFile << inputLine << std::endl;
       int inputNum1 = getFirstInput(inputLine);
       if(findContestant(&pointsMinHeap, &indexHandler, inputNum1) == -1){
         outputFile << "There is no Contestant <" << inputNum1 << "> in the extended heap: handle[<" << inputNum1 << ">] == -1." << std::endl;
@@ -295,9 +307,11 @@ int main(int argc, char* argv[]){
         outputFile << "Contestant <" << inputNum1 << "> stored in extended heap location <" << heapLocation << ">." << std::endl;
       }
     } else if(inputLine == "crownWinner") {
+      outputFile << inputLine << std::endl;
       crownWinner(&pointsMinHeap, &indexHandler, &outputFile);
     } else {
       //Invaled Instruction
+      outputFile << inputLine << std::endl;
       std::cout << "Instruction " << inputLine << " is invalid." << std::endl;
     }
   }
