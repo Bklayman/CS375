@@ -39,8 +39,12 @@ void printHandles(std::map<int, int> *indexHandler, int maxHeapSize){
 }
 
 void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, std::ofstream *outputFile){
+  int places[pointsMinHeap->size()];
   for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
-    *outputFile << "Contestant <" << it->first << "> in extended heap location <" << it->second + 1 << "> with score <" << (*pointsMinHeap)[it->second] << ">." << std::endl;
+    places[it->second] = it->first;
+  }
+  for(int i = 0; i < pointsMinHeap->size(); i++){
+    *outputFile << "Contestant <" << places[i] << "> in extended heap location <" << i + 1 << "> with score <" << (*pointsMinHeap)[i] << ">." << std::endl;
   }
 }
 
@@ -51,23 +55,28 @@ void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *inde
 }
 
 void swapNodes(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index1, int index2){ //Duplicates an item in indexHandler
-  std::cout << index1 << " " << index2 << std::endl;
   if(index1 >= indexHandler->size() || index2 >= indexHandler->size()){
     std::cout << "Error: swap has bad indexes" << std::endl;
     exit(1);
   }
-  std::cout << indexHandler->size() << std::endl;
-  int location1 = (*indexHandler)[index1 + 1]; //Adds an item to indexHandler
-  std::cout << indexHandler->size() << std::endl;
-  int points1 = (*pointsMinHeap)[location1];
-  int location2 = (*indexHandler)[index2 + 1];
-  (*pointsMinHeap)[location1] = (*pointsMinHeap)[location2];
-  (*indexHandler)[index1 + 1] = location2;
-  (*indexHandler)[index2 + 1] = location1;
-  (*pointsMinHeap)[location2] = points1;
+  int location1 = -1; //Where in indexHandler index1 is found
+  int location2 = -1;
+  for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
+    if(it->second == index1){
+      location1 = it->first;
+    }
+    if(it->second == index2){
+      location2 = it->first;
+    }
+  }
+  int points1 = (*pointsMinHeap)[index1];
+  (*pointsMinHeap)[index1] = (*pointsMinHeap)[index2];
+  (*indexHandler)[location1] = index2;
+  (*indexHandler)[location2] = index1;
+  (*pointsMinHeap)[index2] = points1;
 }
 
-void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){ //Duplicates an item in swap
+void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){
   for(int i = pointsMinHeap->size() / 2 - 1; i >= 0 && pointsMinHeap->size() != 1; i--){
     int curI = i;
     bool finished = false;
@@ -79,7 +88,7 @@ void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandle
       int minPoints = (*pointsMinHeap)[i];
       if((*pointsMinHeap)[(int)i] > (*pointsMinHeap)[(int)2i + 1]){
         minFound = 1;
-        minPoints = (*pointsMinHeap)[(int)2i];
+        minPoints = (*pointsMinHeap)[(int)2i + 1];
       }
       if(pointsMinHeap->size() > (int)2i + 2 && minPoints > (*pointsMinHeap)[(int)2i + 2]){
         minFound = 2;
@@ -87,11 +96,9 @@ void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandle
       }
       switch(minFound){
         case 1:
-          std::cout << (int)i << " " << (int)2i + 1 << std::endl;
           swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2i + 1);
           break;
         case 2:
-          std::cout << (int)i << " " << (int)2i + 2 << std::endl;
           swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2i+2);
           break;
       }
@@ -123,7 +130,6 @@ std::string eliminateWeakest(std::vector<int> *pointsMinHeap, std::map<int, int>
       nextCopy = (*pointsMinHeap)[i];
       (*pointsMinHeap)[i] = curCopy;
     }
-    //TODO: Change handle for the last element before to 0
     for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
       if(it->second == pointsMinHeap->size()){
         it->second = 0;
@@ -257,6 +263,8 @@ int main(int argc, char* argv[]){
       } else {
         int pointsIndex = indexHandler[inputNum1];
         pointsMinHeap[pointsIndex] += inputNum2;
+        minHeapify(&pointsMinHeap, &indexHandler);
+        pointsIndex = indexHandler[inputNum1];
         outputFile << "Contestant <" << inputNum1 << ">'s score increased by <" << inputNum2 << "> points to <" << pointsMinHeap[pointsIndex] << ">." << std::endl;
       }
     } else if(inputLine.length() >= 18 && inputLine.substr(0, 10) == "losePoints") {
@@ -268,6 +276,7 @@ int main(int argc, char* argv[]){
       } else {
         int pointsIndex = indexHandler[inputNum1];
         pointsMinHeap[pointsIndex] -= inputNum2;
+        minHeapify(&pointsMinHeap, &indexHandler);
         outputFile << "Contestant <" << inputNum1 << ">'s score decreased by <" << inputNum2 << "> points to <" << pointsMinHeap[pointsIndex] << ">." << std::endl;
       }
     } else if(inputLine == "showContestants") {
