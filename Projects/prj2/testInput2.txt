@@ -1,5 +1,14 @@
 5
-insertContestant <1> <2>
-insertContestant <2> <1>
-eliminateWeakest
+insertContestant <1> <1>
+insertContestant <2> <2>
+insertContestant <3> <3>
+insertContestant <3> <4>
+insertContestant <4> <4>
+findContestant <1>
+earnPoints <2> <3>
 showContestants
+losePoints <4> <2>
+showHandles
+eliminateWeakest
+showLocation <1>
+crownWinner
