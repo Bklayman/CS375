@@ -26,13 +26,13 @@ void printExtendedHeap(std::vector<int> *pointsMinHeap, std::map<int, int> *inde
   for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
     places[it->second] = it->first;
   }
-  for(int i = 0; i < pointsMinHeap->size(); i++){
+  for(int i = 0; i < (int) pointsMinHeap->size(); i++){
     *outputFile << "Contestant <" << places[i] << "> in extended heap location <" << i + 1 << "> with score <" << (*pointsMinHeap)[i] << ">." << std::endl;
   }
 }
 
 void swapNodes(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index1, int index2){ //Duplicates an item in indexHandler
-  if(index1 >= indexHandler->size() || index2 >= indexHandler->size()){
+  if(index1 >= (int) indexHandler->size() || index2 >= (int) indexHandler->size()){
     std::cout << "Error: swap has bad indexes" << std::endl;
     exit(1);
   }
@@ -54,7 +54,7 @@ void swapNodes(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler
 }
 
 void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){
-  for(int i = pointsMinHeap->size() / 2 - 1; i >= 0 && pointsMinHeap->size() != 1; i--){
+  for(int i = (int) pointsMinHeap->size() / 2 - 1; i >= 0 && (int) pointsMinHeap->size() != 1; i--){
     int curI = i;
     bool finished = false;
     while(!finished){
@@ -63,20 +63,20 @@ void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandle
       }
       int minFound = 0;
       int minPoints = (*pointsMinHeap)[i];
-      if((*pointsMinHeap)[(int)i] > (*pointsMinHeap)[(int)2i + 1]){
+      if((*pointsMinHeap)[(int)i] > (*pointsMinHeap)[(int)2.0*i + 1]){
         minFound = 1;
-        minPoints = (*pointsMinHeap)[(int)2i + 1];
+        minPoints = (*pointsMinHeap)[(int)2.0*i + 1];
       }
-      if(pointsMinHeap->size() > (int)2i + 2 && minPoints > (*pointsMinHeap)[(int)2i + 2]){
+      if((int) pointsMinHeap->size() > (int)2.0*i + 2 && minPoints > (*pointsMinHeap)[(int)2.0*i + 2]){
         minFound = 2;
-        minPoints = (*pointsMinHeap)[(int)2i + 2];
+        minPoints = (*pointsMinHeap)[(int)2.0*i + 2];
       }
       switch(minFound){
         case 1:
-          swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2i + 1);
+          swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2.0*i + 1);
           break;
         case 2:
-          swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2i+2);
+          swapNodes(pointsMinHeap, indexHandler, (int)i, (int)2.0*i+2);
           break;
       }
       i /= 2;
@@ -87,7 +87,7 @@ void minHeapify(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandle
 
 std::string eliminateWeakest(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler){
   std::string result = "";
-  if(pointsMinHeap->size() == 0){
+  if((int)pointsMinHeap->size() == 0){
     result += "No contestant can be eliminated since the extended heap is empty.";
   } else {
     int weakIndex = -1;
@@ -101,14 +101,14 @@ std::string eliminateWeakest(std::vector<int> *pointsMinHeap, std::map<int, int>
     result += "Contestant <" + std::to_string(weakIndex) + "> with current lowest score <" + std::to_string(weakPoints) + "> eliminated.";
     pointsMinHeap->erase(pointsMinHeap->begin(), pointsMinHeap->begin() + 1);
     indexHandler->erase(weakIndex);
-    int nextCopy = (*pointsMinHeap)[pointsMinHeap->size() - 1];
-    for(int i = 0; i < pointsMinHeap->size(); i++){
+    int nextCopy = (*pointsMinHeap)[(int) pointsMinHeap->size() - 1];
+    for(int i = 0; i < (int) pointsMinHeap->size(); i++){
       int curCopy = nextCopy;
       nextCopy = (*pointsMinHeap)[i];
       (*pointsMinHeap)[i] = curCopy;
     }
     for(std::map<int, int>::iterator it = indexHandler->begin(); it != indexHandler->end(); ++it){
-      if(it->second == pointsMinHeap->size()){
+      if(it->second == (int) pointsMinHeap->size()){
         it->second = 0;
         break;
       }
@@ -119,7 +119,7 @@ std::string eliminateWeakest(std::vector<int> *pointsMinHeap, std::map<int, int>
 }
 
 void crownWinner(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, std::ofstream *outputFile){
-  while(pointsMinHeap->size() > 1){
+  while((int) pointsMinHeap->size() > 1){
     eliminateWeakest(pointsMinHeap, indexHandler);
   }
   std::map<int, int>::iterator it = indexHandler->begin();
@@ -128,7 +128,7 @@ void crownWinner(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandl
 
 void insertContestant(std::vector<int> *pointsMinHeap, std::map<int, int> *indexHandler, int index, int points){
   pointsMinHeap->push_back(points);
-  indexHandler->insert(std::pair<int, int>(index, pointsMinHeap->size() - 1));
+  indexHandler->insert(std::pair<int, int>(index, (int) pointsMinHeap->size() - 1));
   minHeapify(pointsMinHeap, indexHandler);
 }
 
@@ -222,7 +222,7 @@ int main(int argc, char* argv[]){
       if(findContestant(&pointsMinHeap, &indexHandler, inputNum1) != -1){
         outputFile << "Contestant <" << inputNum1 << "> is already in the extended heap: cannot insert." << std::endl;
       } else {
-        if(pointsMinHeap.size() >= maxHeapSize){
+        if((int)pointsMinHeap.size() >= maxHeapSize){
           outputFile << "Contestant <" << inputNum1 << "> could not be inserted because the extended heap is full." << std::endl;
         } else {
           insertContestant(&pointsMinHeap, &indexHandler, inputNum1, inputNum2);
