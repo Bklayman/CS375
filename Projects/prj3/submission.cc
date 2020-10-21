@@ -88,8 +88,30 @@ void greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, 
   (*outputFile) << numInput << " " << profit << " " << timeTaken << std::endl;
 }
 
+int greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight, bool arbitraryVariable){
+  int profit = 0;
+  for(int i = 0; i < input.size(); i++){
+    std::cout << input[i].first << " " << input[i].second << std::endl;
+  }
+  for(int i = 0; i < numInput && weight > 0; i++){
+    if(input[i].first <= weight){
+      weight-= input[i].first;
+      profit+= input[i].second;
+    }
+  }
+  return profit;
+}
+
 void greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight){
-  //TODO
+  int totalProfit = greedy1(input, outputFile, begin, numInput, weight, true);
+  for(int i = 0; i < input.size(); i++){
+    if(totalProfit < input[i].second && input[i].first <= weight){
+      totalProfit = input[i].second;
+    }
+  }
+  long end = std::chrono::system_clock::now().time_since_epoch().count();
+  long timeTaken = end - begin;
+  (*outputFile) << numInput << " " << totalProfit << " " << timeTaken << std::endl;
 }
 
 void backtrack(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight){
@@ -115,7 +137,6 @@ int main(int argc, char** argv){
   while(getline(inputFile, inputLine)){
     input.push_back(inputLine);
   }
-  //Sorting everything. Need to split into different vectors.
   std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> sortedInput = splitAndSort(input);
 
   std::ofstream outputFile;
