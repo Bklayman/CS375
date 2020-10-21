@@ -61,8 +61,8 @@ std::vector<std::pair<int, int>> sortInput(std::vector<std::string> input){
 
 std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> splitAndSort(std::vector<std::string> input){
   std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> result;
-  for(int i = 0; i < input.size(); i++){
-    std::pair<int, int> pairDescript = getInputPair(input[0]);
+  for(int i = 0; i < input.size(); ){
+    std::pair<int, int> pairDescript = getInputPair(input[i]);
     int curI = i;
     std::vector<std::string> stringList;
     for(i++ ; i < curI + pairDescript.first + 1; i++){
@@ -77,7 +77,7 @@ std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> sp
 
 void greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight){
   int profit = 0;
-  for(int i = 1; i < numInput + 1 && weight > 0; i++){
+  for(int i = 0; i < numInput && weight > 0; i++){
     if(input[i].first <= weight){
       weight-= input[i].first;
       profit+= input[i].second;
