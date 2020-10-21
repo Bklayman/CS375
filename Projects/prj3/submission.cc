@@ -90,9 +90,6 @@ void greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, 
 
 int greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight, bool arbitraryVariable){
   int profit = 0;
-  for(int i = 0; i < input.size(); i++){
-    std::cout << input[i].first << " " << input[i].second << std::endl;
-  }
   for(int i = 0; i < numInput && weight > 0; i++){
     if(input[i].first <= weight){
       weight-= input[i].first;
@@ -114,8 +111,60 @@ void greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, 
   (*outputFile) << numInput << " " << totalProfit << " " << timeTaken << std::endl;
 }
 
+int greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight, bool arbitraryVariable){
+  int totalProfit = greedy1(input, outputFile, begin, numInput, weight, true);
+  for(int i = 0; i < input.size(); i++){
+    if(totalProfit < input[i].second && input[i].first <= weight){
+      totalProfit = input[i].second;
+    }
+  }
+  return totalProfit;
+}
+
+int KWF(std::vector<std::pair<int, int>> input, int index, int weight, int curProfit, int curWeight){
+  while(index < input.size() && curWeight < weight){
+    if(input[index].first + curWeight < weight){
+      curWeight+= input[index].first;
+      curProfit+= input[index].second;
+    } else {
+      curProfit+= input[index].second * (weight - curWeight) / input[index].first;
+      curWeight = weight;
+    }
+    index++;
+  }
+  return curProfit;
+}
+
+int backtrackHelper(std::vector<std::pair<int, int>> input, int weight, int index, int maxProfit, int curProfit, int curWeight){
+  if(index == input.size() && curWeight <= weight){
+    return curProfit;
+  }
+  if(curWeight > weight){
+    return maxProfit;
+  }
+  int KWFProfit = KWF(input, index, weight, curProfit, curWeight);
+  if(KWFProfit <= maxProfit || KWFProfit == curProfit){
+    return maxProfit;
+  }
+  int possibleProfit = curProfit + input[index].second;
+  int possibleWeight = curWeight + input[index].first;
+  int leftTree = backtrackHelper(input, weight, index + 1, maxProfit, possibleProfit, possibleWeight);
+  if(leftTree > maxProfit){
+    maxProfit = leftTree;
+  }
+  int rightTree = backtrackHelper(input, weight, index + 1, maxProfit, curProfit, curWeight);
+  if(rightTree > maxProfit){
+    maxProfit = rightTree;
+  }
+  return maxProfit;
+}
+
 void backtrack(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight){
-  //TODO
+  int maxProfit = greedy2(input, outputFile, begin, numInput, weight, true);
+  maxProfit = backtrackHelper(input, weight, 0, maxProfit, 0, 0);
+  long end = std::chrono::system_clock::now().time_since_epoch().count();
+  long timeTaken = end - begin;
+  (*outputFile) << numInput << " " << maxProfit << " " << timeTaken << std::endl;
 }
 
 int main(int argc, char** argv){
