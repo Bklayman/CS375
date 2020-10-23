@@ -42,11 +42,11 @@ std::pair<int, int> getInputPair(std::string input){
 
 std::vector<std::pair<int, int>> sortInput(std::vector<std::string> input){
   std::vector<std::pair<int, int>> sortedInput;
-  for(int i = 0; i < input.size(); i++){
+  for(int i = 0; i < (int)input.size(); i++){
     sortedInput.push_back(getInputPair(input[i]));
   }
-  for(int i = 0; i < sortedInput.size() - 1; i++){
-    for(int j = i + 1; j < sortedInput.size(); j++){
+  for(int i = 0; i < (int)sortedInput.size() - 1; i++){
+    for(int j = i + 1; j < (int)sortedInput.size(); j++){
       double iUnitCost = sortedInput[i].second / sortedInput[i].first;
       double jUnitCost = sortedInput[j].second / sortedInput[j].first;
       if(jUnitCost > iUnitCost){
@@ -61,7 +61,7 @@ std::vector<std::pair<int, int>> sortInput(std::vector<std::string> input){
 
 std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> splitAndSort(std::vector<std::string> input){
   std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> result;
-  for(int i = 0; i < input.size(); ){
+  for(int i = 0; i < (int)input.size(); ){
     std::pair<int, int> pairDescript = getInputPair(input[i]);
     int curI = i;
     std::vector<std::string> stringList;
@@ -101,7 +101,7 @@ int greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, l
 
 void greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight){
   int totalProfit = greedy1(input, outputFile, begin, numInput, weight, true);
-  for(int i = 0; i < input.size(); i++){
+  for(int i = 0; i < (int)input.size(); i++){
     if(totalProfit < input[i].second && input[i].first <= weight){
       totalProfit = input[i].second;
     }
@@ -113,7 +113,7 @@ void greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, 
 
 int greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, long begin, int numInput, int weight, bool arbitraryVariable){
   int totalProfit = greedy1(input, outputFile, begin, numInput, weight, true);
-  for(int i = 0; i < input.size(); i++){
+  for(int i = 0; i < (int)input.size(); i++){
     if(totalProfit < input[i].second && input[i].first <= weight){
       totalProfit = input[i].second;
     }
@@ -122,7 +122,7 @@ int greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, l
 }
 
 int KWF(std::vector<std::pair<int, int>> input, int index, int weight, int curProfit, int curWeight){
-  while(index < input.size() && curWeight < weight){
+  while(index < (int)input.size() && curWeight < weight){
     if(input[index].first + curWeight < weight){
       curWeight+= input[index].first;
       curProfit+= input[index].second;
@@ -136,7 +136,7 @@ int KWF(std::vector<std::pair<int, int>> input, int index, int weight, int curPr
 }
 
 int backtrackHelper(std::vector<std::pair<int, int>> input, int weight, int index, int maxProfit, int curProfit, int curWeight){
-  if(index == input.size() && curWeight <= weight){
+  if(index == (int)input.size() && curWeight <= weight){
     return curProfit;
   }
   if(curWeight > weight){
