@@ -9,8 +9,8 @@ std::vector<int> maxPointsIndexes;
 int mpProfit = 0;
 
 void sortMaxPointsIndexes(){
-  for(int i = 0; i < maxPointsIndexes.size() - 1; i++){
-    for(int j = i + 1; j < maxPointsIndexes.size(); j++){
+  for(int i = 0; i < (int)maxPointsIndexes.size() - 1; i++){
+    for(int j = i + 1; j < (int)maxPointsIndexes.size(); j++){
       if(maxPointsIndexes[i] > maxPointsIndexes[j]){
         int curI = maxPointsIndexes[i];
         maxPointsIndexes[i] = maxPointsIndexes[j];
@@ -110,7 +110,7 @@ void greedy1(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, 
   long end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   long timeTaken = end - begin;
   (*outputFile) << numInput << " " << profit << " " << timeTaken << " ";
-  for(int i = 0; i < winningNums.size(); i++){
+  for(int i = 0; i < (int)winningNums.size(); i++){
     (*outputFile) << winningNums[i] + 1 << " ";
   }
   (*outputFile) << std::endl;
@@ -144,7 +144,7 @@ void greedy2(std::vector<std::pair<int, int>> input, std::ofstream *outputFile, 
   long end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   long timeTaken = end - begin;
   (*outputFile) << numInput << " " << totalProfit << " " << timeTaken << " ";
-  for(int i = 0; i < maxPointsIndexes.size(); i++){
+  for(int i = 0; i < (int)maxPointsIndexes.size(); i++){
     (*outputFile) << maxPointsIndexes[i] + 1 << " ";
   }
   (*outputFile) << std::endl;
@@ -216,7 +216,7 @@ void backtrack(std::vector<std::pair<int, int>> input, std::ofstream *outputFile
   long end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   long timeTaken = end - begin;
   (*outputFile) << numInput << " " << maxProfit << " " << timeTaken << " ";
-  for(int i = 0; i < maxPointsIndexes.size(); i++){
+  for(int i = 0; i < (int)maxPointsIndexes.size(); i++){
     (*outputFile) << maxPointsIndexes[i] + 1 << " ";
   }
   (*outputFile) << std::endl;
