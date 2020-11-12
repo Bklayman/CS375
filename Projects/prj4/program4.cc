@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -152,7 +153,7 @@ int main(int argc, char** argv){
     exit(1);
   }
 
-  for(int i = 0; i < sortedInput.size(); i++){
+  for(int i = 0; i < (int)sortedInput.size(); i++){
     std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>> curProblem = sortedInput[i];
     computeDynamic(curProblem, &outputFile, begin);
   }
