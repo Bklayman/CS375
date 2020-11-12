@@ -89,6 +89,10 @@ void computeDynamic(std::pair<std::pair<int, int>, std::vector<std::pair<int, in
     return;
   }
   int dynamicStorage[2][capacity + 1];
+  for(int i = 0; i < capacity + 1; i++){
+    dynamicStorage[0][i] = 0;
+    dynamicStorage[1][i] = 0;
+  }
   std::vector<std::pair<int, int>> items = data.second;
   for(int i = 0; i < data.first.first; i++){
     if(i != 0){
