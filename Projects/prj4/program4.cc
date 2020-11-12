@@ -79,14 +79,54 @@ std::vector<std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>>> sp
   return result;
 }
 
+void computeDynamic(std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>> data, std::ofstream* outputFile, long begin){
+  int capacity = data.first.second;
+  if(capacity == 0 || data.second.size() == 0){
+    long end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    long timeTaken = end-begin;
+    (*outputFile) << "Dynamic Programming: " << data.second.size() << " 0 " << timeTaken << std::endl;
+    return;
+  }
+  int dynamicStorage[2][capacity + 1];
+  std::vector<std::pair<int, int>> items = data.second;
+  for(int i = 0; i < data.first.first; i++){
+    if(i != 0){
+      for(int i = 0; i < capacity + 1; i++){
+        dynamicStorage[0][i] = dynamicStorage[1][i];
+        dynamicStorage[1][i] = 0;
+      }
+    }
+    for(int j = 0; j < capacity + 1; j++){
+      if(items[i].first > capacity){
+        dynamicStorage[1][j] = dynamicStorage[0][j];
+      } else {
+        int notInclude = dynamicStorage[0][j];
+        int include = 0;
+        if(j >= items[i].first){
+          include = dynamicStorage[0][j - items[i].first] + items[i].second;
+        }
+        if(notInclude > include){
+          dynamicStorage[1][j] = notInclude;
+        } else {
+          dynamicStorage[1][j] = include;
+        }
+      }
+    }
+  }
+  long end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+  long timeTaken = end-begin;
+  (*outputFile) << "Dynamic Programming: " << items.size() << " " << dynamicStorage[1][capacity] << " " << timeTaken << std::endl;
+}
+
 int main(int argc, char** argv){
   if(argc != 4){
     std::cout << "Usage: ./program4 <input file name> <output file name> 3" << std::endl;
     exit(1);
   }
 
-  if(strncmp(argv[4], "3", 2) != 0){
+  if(strncmp(argv[3], "3", 2) != 0){
     std::cout << "Error: This program only computes method 3." << std::endl;
+    exit(1);
   }
 
   long begin = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -114,7 +154,6 @@ int main(int argc, char** argv){
 
   for(int i = 0; i < sortedInput.size(); i++){
     std::pair<std::pair<int, int>, std::vector<std::pair<int, int>>> curProblem = sortedInput[i];
-    int dynamicStorage[2][curProblem.first.second + 1];
+    computeDynamic(curProblem, &outputFile, begin);
   }
-
 }
